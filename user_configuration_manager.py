@@ -1,3 +1,23 @@
+import mysql.connector
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Collego questo programma con mysql
+# I connect this program to MySQL
+
+conn = mysql.connector.connect(
+
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
+
+)
+
+cursor = conn.cursor()
+
 test_settings = {
     'theme': 'light'
 
@@ -50,22 +70,23 @@ def delete_setting(dictionary, key):
 
         return "Setting not found!"
 
-def view_settings(dictionary):
+def view_settings():
 
-    if dictionary == {}:
+    cursor.execute("SELECT setting_name, setting_value FROM settings")
+
+    rows = cursor.fetchall()
+
+    if not rows:
 
         return "No settings available."
 
-    else:
+    result = "Current User Settings:\n"
 
-        result = "Current User Settings:\n"
+    for key, value in rows:
 
-        for key, value in dictionary.items(): # items() restituisce coppie chiave-valore da un dizionario
+        result += f"{key.capitalize()}: {value}\n"
 
-
-            result += f"{key.capitalize()}: {value}\n" #non va mai la virgola tra la key e la value, perchè diventano tuple, usa i ":"... capitalize() fa diventare maiuscole la lettera iniziale
-
-        return result
+    return result
 
 tuple1 = ('volume', 'high')
 
@@ -74,3 +95,5 @@ tuple2 = ('theme', 'dark')
 print(add_setting(test_settings, tuple1))
 
 print(update_setting(test_settings, tuple2))
+
+print(view_settings())
