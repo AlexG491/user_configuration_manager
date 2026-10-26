@@ -24,21 +24,26 @@ test_settings = {
 }
 
 
-def add_setting(dictionary, key_value):
+def add_setting(key_value):
 
     key, value = key_value
+    key, value = key.lower(), value.lower()
 
-    key, value = key.lower(), value.lower() # lower() fa diventare tutto minuscolo
 
-    if key in dictionary:
+    try:
 
-        return f"Setting '{key}' already exists! Cannot add a new setting with this name."
+        cursor.execute(
+            "INSERT INTO settings (setting_name, setting_value) VALUES (%s, %s)",
+            (key, value)
+        )
 
-    else:
-
-        dictionary[key] = value
+        conn.commit()
 
         return f"Setting '{key}' added with value '{value}' successfully!"
+
+    except mysql.connector.IntegrityError:
+
+        return f"Setting '{key}' already exists! Cannot add a new setting with this name."
 
 def update_setting(dictionary, key_value):
 
@@ -92,7 +97,7 @@ tuple1 = ('volume', 'high')
 
 tuple2 = ('theme', 'dark')
 
-print(add_setting(test_settings, tuple1))
+print(add_setting(tuple1))
 
 print(update_setting(test_settings, tuple2))
 
