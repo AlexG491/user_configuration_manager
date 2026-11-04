@@ -18,12 +18,6 @@ conn = mysql.connector.connect(
 
 cursor = conn.cursor()
 
-test_settings = {
-    'theme': 'light'
-
-}
-
-
 def add_setting(key_value):
 
     key, value = key_value
@@ -45,21 +39,30 @@ def add_setting(key_value):
 
         return f"Setting '{key}' already exists! Cannot add a new setting with this name."
 
-def update_setting(dictionary, key_value):
+def update_setting(key_value):
 
     key, value = key_value
-
     key, value = key.lower(), value.lower()
 
-    if key in dictionary:
+    cursor.execute(
+        "SELECT setting_name FROM settings WHERE setting_name = %s",
+        (key,)
+    )
 
-        dictionary[key] = value
+    row = cursor.fetchone()
 
-        return f"Setting '{key}' updated to '{value}' successfully!"
-
-    else:
+    if row is None:
 
         return f"Setting '{key}' does not exist! Cannot update a non-existing setting."
+
+    cursor.execute(
+        "UPDATE settings SET setting_value = %s WHERE setting_name = %s",
+        (value, key)
+    )
+
+    conn.commit()
+
+    return f"Setting '{key}' updated to '{value}' successfully!"
 
 def delete_setting(dictionary, key):
 
@@ -67,7 +70,7 @@ def delete_setting(dictionary, key):
 
     if key in dictionary:
 
-        dictionary.pop(key) # pop() cancella quel singolo elemento che vuoi cancellare
+        dictionary.pop(key)
 
         return f"Setting '{key}' deleted successfully!"
 
@@ -95,10 +98,10 @@ def view_settings():
 
 tuple1 = ('volume', 'high')
 
-tuple2 = ('theme', 'dark')
+tuple2 = ('theme', 'light')
 
 print(add_setting(tuple1))
 
-print(update_setting(test_settings, tuple2))
+print(update_setting(tuple2))
 
 print(view_settings())
