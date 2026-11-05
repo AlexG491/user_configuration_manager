@@ -18,6 +18,9 @@ conn = mysql.connector.connect(
 
 cursor = conn.cursor()
 
+# aggiunge la chiave nella tabella, solo se la chiave è nuova.
+# add the key in the table, only if the key is new.
+
 def add_setting(key_value):
 
     key, value = key_value
@@ -38,6 +41,9 @@ def add_setting(key_value):
     except mysql.connector.IntegrityError:
 
         return f"Setting '{key}' already exists! Cannot add a new setting with this name."
+
+# aggiorna le chiavi esistenti
+# updates existing keys
 
 def update_setting(key_value):
 
@@ -64,6 +70,9 @@ def update_setting(key_value):
 
     return f"Setting '{key}' updated to '{value}' successfully!"
 
+# cancella le chiavi esistenti
+# deletes existing keys
+
 def delete_setting(key):
 
     key = key.lower()
@@ -87,6 +96,9 @@ def delete_setting(key):
     conn.commit()
     
     return f"'{key}' was deleted successfully!"
+
+# visualizza le chiavi
+# views the keys
 
 def view_settings():
 
