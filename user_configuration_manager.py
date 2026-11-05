@@ -64,19 +64,29 @@ def update_setting(key_value):
 
     return f"Setting '{key}' updated to '{value}' successfully!"
 
-def delete_setting(dictionary, key):
+def delete_setting(key):
 
     key = key.lower()
 
-    if key in dictionary:
-
-        dictionary.pop(key)
-
-        return f"Setting '{key}' deleted successfully!"
-
-    else:
-
-        return "Setting not found!"
+    cursor.execute(
+            "SELECT setting_name FROM settings WHERE setting_name = %s",
+            (key,)
+        )
+    
+    row = cursor.fetchone()
+    
+    if row is None:
+    
+        return f"Setting '{key}' does not exist! Cannot delete a non-existing setting."
+    
+    cursor.execute(
+        "DELETE FROM settings WHERE setting_name = %s",
+        (key,)
+    )
+    
+    conn.commit()
+    
+    return f"'{key}' was deleted successfully!"
 
 def view_settings():
 
@@ -99,6 +109,7 @@ def view_settings():
 tuple1 = ('volume', 'high')
 
 tuple2 = ('theme', 'light')
+
 
 print(add_setting(tuple1))
 
